@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.unikie.portactivity.rauma",
+    "sha256_cert_fingerprints":
+    ["5E:00:F5:84:7D:D2:2E:85:83:B5:03:76:AC:D0:A8:A2:44:CA:0F:E7:D9:FD:95:9D:64:0F:86:07:B6:D7:B8:DB"]
+  }
+}]

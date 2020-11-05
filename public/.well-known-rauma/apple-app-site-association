@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "N335UMVM8A.com.unikie.portactivity.rauma",
+        "components": [
+          {
+            "/": "/reset-password/*",
+            "comment": "Matches any URL whose path starts with /reset-password/"
+          }
+        ],
+        "paths": ["/reset-password/*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [ "N335UMVM8A.com.unikie.portactivity.rauma" ]
+  }
+}

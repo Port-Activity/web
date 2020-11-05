@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.unikie.portactivity.gavle",
+    "sha256_cert_fingerprints":
+    ["5D:A1:46:E2:60:83:45:71:D7:07:7B:9D:B4:93:A1:1E:BF:4C:FD:C6:19:0A:85:1A:ED:DD:82:36:A8:90:56:64"]
+  }
+}]

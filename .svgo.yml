@@ -1,0 +1,5 @@
+plugins:
+  - sortAttrs: true
+  - removeDimensions: true
+  - removeAttrs:
+      attrs: 'fill'

@@ -1,0 +1,86 @@
+stages:
+- name: Build rauma
+  steps:
+  - runScriptConfig:
+      image: node:12-alpine
+      shellScript: |-
+        apk update && apk upgrade && apk add git
+        yarn install
+        yarn lint
+        yarn build:rauma
+        yarn build:version_json
+        yarn build
+    envFrom:
+    - sourceName: web
+      sourceKey: REACT_APP_SENTRY_DSN
+      targetKey: REACT_APP_SENTRY_DSN
+    - sourceName: web
+      sourceKey: SENTRY_AUTH_TOKEN
+      targetKey: SENTRY_AUTH_TOKEN
+    env:
+      REACT_APP_API_BASE: /api/v1
+- name: Publish raumaimage
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: web:${CICD_EXECUTION_SEQUENCE}-${CICD_GIT_COMMIT}-rauma
+- name: Build gavle
+  steps:
+  - runScriptConfig:
+      image: node:12-alpine
+      shellScript: |-
+        apk update && apk upgrade && apk add git
+        yarn install
+        yarn lint
+        yarn build:gavle
+        yarn build:version_json
+        yarn build
+    envFrom:
+    - sourceName: web
+      sourceKey: REACT_APP_SENTRY_DSN
+      targetKey: REACT_APP_SENTRY_DSN
+    - sourceName: web
+      sourceKey: SENTRY_AUTH_TOKEN
+      targetKey: SENTRY_AUTH_TOKEN
+    env:
+      REACT_APP_API_BASE: /api/v1
+- name: Publish gavle image
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: web:${CICD_EXECUTION_SEQUENCE}-${CICD_GIT_COMMIT}-gavle
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deploy/deployment.yaml
+  when:
+    branch:
+      include:
+      - master
+- name: Upload sourcemaps to Sentry
+  steps:
+  - runScriptConfig:
+      image: node:12-alpine
+      shellScript: |-
+        apk update && apk upgrade && apk add git
+        yarn install
+        yarn lint
+        yarn build:version_json
+        yarn build
+        yarn upload-sourcemaps
+    envFrom:
+    - sourceName: web
+      sourceKey: REACT_APP_SENTRY_DSN
+      targetKey: REACT_APP_SENTRY_DSN
+    - sourceName: web
+      sourceKey: SENTRY_AUTH_TOKEN
+      targetKey: SENTRY_AUTH_TOKEN
+    env:
+      REACT_APP_API_BASE: /api/v1
+  when:
+    branch:
+      include:
+      - master
+notification: {}
