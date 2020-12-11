@@ -110,7 +110,7 @@ const AdminQueueSettings = () => {
   };
 
   const handleCancel = () => {
-    history.push('/queue-admin/admin-slot-reservations');
+    history.goBack();
   };
 
   const handleChange = e => {

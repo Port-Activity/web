@@ -85,6 +85,14 @@ const ShipName = styled(Heading)`
   margin-bottom: 0;
 `;
 
+const ShipType = styled.p`
+  font-size: ${({ theme }) => theme.text.small};
+  color: ${({ theme }) => theme.color.grey};
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  margin-bottom: 0;
+`;
+
 const ShipIMO = styled.p`
   font-size: ${({ theme }) => theme.text.small};
   color: ${({ theme }) => theme.color.grey};
@@ -212,6 +220,7 @@ const Card = ({ data, ...props }) => {
     gross_weight,
     badges,
     next_event,
+    vessel_type_name,
   } = data;
 
   const [open, setOpen] = useState(false);
@@ -255,7 +264,9 @@ const Card = ({ data, ...props }) => {
       : false;
 
   const hasData =
-    mmsi || call_sign || net_weight || gross_weight || type || status || loa || beam || draft ? true : false;
+    mmsi || call_sign || net_weight || gross_weight || type || status || loa || beam || draft || vessel_type_name
+      ? true
+      : false;
 
   return (
     <CardWrapper open={open} pinned={pinned} {...props}>
@@ -269,6 +280,7 @@ const Card = ({ data, ...props }) => {
             {vessel_name}
             <Nationality>{nationality}</Nationality>
           </ShipName>
+          <ShipType>{vessel_type_name ? t(vessel_type_name) : t('Unknown Vessel Type')}</ShipType>
           <ShipIMO onClick={() => history.push(`/admin/port-calls/${id}`)}>IMO {imo}</ShipIMO>
           {from_port ? (
             <ShipRoute

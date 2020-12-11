@@ -8,7 +8,7 @@ import { UserContext } from '../../context/UserContext';
 
 import useApi from '../../hooks/useApi';
 
-import { Alert, Spin, Popconfirm } from 'antd';
+import { Alert, Spin, Popconfirm, Modal, message } from 'antd';
 
 import Text from 'antd/lib/typography/Text';
 
@@ -18,6 +18,7 @@ import PageSearch from '../../components/page/PageSearch';
 import Table from '../../components/ui/Table';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/ui/Icon';
+import SelectWithSearch from '../../components/ui/SelectWithSearch';
 
 const RowActions = styled.div`
   button {
@@ -39,6 +40,24 @@ const Vessels = () => {
     document.title = 'Vessels';
   }, []);
 
+  const initEditedVessel = {
+    id: null,
+    vessel_type: null,
+  };
+
+  const [editedVessel, setEditedVessel] = useState(initEditedVessel);
+
+  const initModal = {
+    visible: false,
+    confirmLoading: false,
+    vessel: {
+      id: null,
+      vessel_type: null,
+    },
+  };
+
+  const [modal, setModal] = useState(initModal);
+
   const params = new URLSearchParams(location.search);
   const pageSize = 10;
   const defaultParams = {
@@ -48,8 +67,24 @@ const Vessels = () => {
     search: params.get('search') ? params.get('search') : '',
   };
   const [search, setSearch] = useState(params.get('search') ? params.get('search') : '');
-  const { loading, data, error, fetchData } = useApi('get', 'vessels', defaultParams);
 
+  const { loading: typesLoading, data: typesData, error: typesError } = useApi('get', 'vessel-types', {});
+
+  if (typesError) {
+    message.error(typesError, 4);
+  }
+
+  const vesselTypes =
+    typesData && typesData.length > 0
+      ? typesData.map(type => {
+          type.key = type.name;
+          type.label = type.name;
+          type.value = type.id;
+          return type;
+        })
+      : [];
+
+  const { loading, data, error, fetchData } = useApi('get', 'vessels', defaultParams);
   const vessels = error || !data ? [] : data.data;
   const { start, total } = error || !data ? {} : data.pagination;
   let counter = 1;
@@ -142,12 +177,66 @@ const Vessels = () => {
     fetchData(false, params);
   };
 
-  const handlePortCallRebuild = async imo => {
+  const showModal = async id => {
+    let matchingVessel = vessels.find(vessel => {
+      return vessel.id === id;
+    });
+    if (matchingVessel) {
+      setEditedVessel({ ...matchingVessel });
+      setModal({ ...initModal, visible: true });
+    }
+  };
+
+  const handleModalOk = async () => {
+    setModal({
+      ...modal,
+      confirmLoading: true,
+    });
     setApiCallPending(true);
-    await apiCall('get', 'rebuild-port-calls', { imo: imo });
+    try {
+      const result = await apiCall('put', 'vessel', {
+        id: editedVessel.id,
+        vesselType: parseInt(editedVessel.vessel_type),
+      });
+      if (result && result.data.result === 'ERROR' && result.data.message.length) {
+        message.error(result.data.message, 4);
+      }
+    } catch (e) {
+      setModal({
+        ...modal,
+        confirmLoading: false,
+      });
+      setApiCallPending(false);
+      throw e;
+    }
     setApiCallPending(false);
+    setModal({
+      ...initModal,
+      visible: false,
+      confirmLoading: false,
+    });
+    setEditedVessel(initEditedVessel);
     let params = defaultParams;
     fetchData(false, params);
+  };
+
+  const handleModalCancel = async () => {
+    setModal(initModal);
+    setEditedVessel(initEditedVessel);
+  };
+
+  const handleModalVesselTypeChange = value => {
+    setEditedVessel({ ...editedVessel, vessel_type: value });
+  };
+
+  const vesselTypeToString = vesselType => {
+    if (!vesselTypes) {
+      return t('Unknown Vessel Type');
+    }
+    let matchingType = vesselTypes.find(type => {
+      return type.id === vesselType;
+    });
+    return matchingType ? matchingType['name'] : t('Unknown Vessel Type');
   };
 
   const columns = [
@@ -188,6 +277,19 @@ const Vessels = () => {
       },
     },
     {
+      title: t('Type'),
+      dataIndex: 'vessel_type',
+      key: 'vessel_type',
+      onHeaderCell: column => {
+        return {
+          onClick: () => {
+            handleColumnClick(column.dataIndex);
+          },
+        };
+      },
+      render: value => value + ' (' + vesselTypeToString(value) + ')',
+    },
+    {
       title: t('Visible'),
       dataIndex: 'visible',
       key: 'visible',
@@ -221,6 +323,11 @@ const Vessels = () => {
             {record.visible ? t('Hide') : t('Show')}
           </Button>
           <br />
+          <Button link disabled={!user.permissions.includes('manage_vessel')} onClick={() => showModal(record.id)}>
+            <Icon type="action" />
+            {t('Change vessel type')}
+          </Button>
+          <br />
           <Button
             link
             disabled={!user.permissions.includes('manage_port_call')}
@@ -243,20 +350,6 @@ const Vessels = () => {
               {t('Attach orphan timestamps')}
             </Button>
           </Popconfirm>
-          <br />
-          <Popconfirm
-            title={t('Really force rebuild of port calls?')}
-            onConfirm={() => handlePortCallRebuild(record.imo)}
-            okText={t('Yes')}
-            okType="danger"
-            cancelText={t('No')}
-            icon={null}
-          >
-            <Button link warning disabled={!user.permissions.includes('manage_port_call')}>
-              <Icon type="action" />
-              {t('Rebuild port calls')}
-            </Button>
-          </Popconfirm>
         </RowActions>
       ),
     },
@@ -267,9 +360,24 @@ const Vessels = () => {
       {alert && <Alert message={alert.message} type={alert.type} banner closable afterClose={() => setAlert(null)} />}
       <Page fullWidth title={t('Vessels')}>
         <Spin spinning={apiCallPending}>
+          <Modal
+            title={t(`Change vessel type for ${editedVessel.vessel_name}`)}
+            visible={modal.visible}
+            onOk={handleModalOk}
+            confirmLoading={modal.confirmLoading}
+            onCancel={handleModalCancel}
+          >
+            <SelectWithSearch
+              name="vessel_type"
+              label={t('Vessel type')}
+              value={editedVessel.vessel_type}
+              options={vesselTypes}
+              onChange={handleModalVesselTypeChange}
+            />
+          </Modal>
           <PageSearch value={search} placeholder={t('Search by name or exact IMO')} onChange={handleSearchChange} />
           <div style={{ clear: 'both' }}>
-            <Spin spinning={loading}>
+            <Spin spinning={loading || typesLoading}>
               <Table
                 rowKey="id"
                 columns={columns}

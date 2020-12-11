@@ -33,7 +33,10 @@ const Authenticate = () => {
       return <Login portName={portName} />;
 
     case 'REGISTER':
-      return <Register portName={portName} />;
+      return <Register portName={portName} withoutCode={false} />;
+
+    case 'REGISTER_WITHOUT_CODE':
+      return <Register portName={portName} withoutCode={true} />;
 
     case 'FORGOT_PASSWORD':
       return <ForgotPassword portName={portName} />;

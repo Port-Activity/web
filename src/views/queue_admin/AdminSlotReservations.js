@@ -23,7 +23,6 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/ui/Icon';
 import Label from '../../components/ui/Label';
-import PageAction from '../../components/page/PageAction';
 
 const RowActions = styled.div`
   button {
@@ -526,14 +525,6 @@ const AdminSlotReservations = () => {
         <PageSearch value={search} placeholder={t('Search by vessel name')} onChange={handleSearchChange} />
         <div style={{ clear: 'both' }}>
           <Spin spinning={loading || berthsLoading}>
-            <PageAction>
-              <Button
-                disabled={!user.permissions.includes('manage_setting')}
-                onClick={() => history.push('/queue-admin/admin-queue-settings')}
-              >
-                Queue Settings
-              </Button>
-            </PageAction>
             <Table
               rowKey="id"
               columns={columns}

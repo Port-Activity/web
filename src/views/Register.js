@@ -29,7 +29,7 @@ const GdprSection = styled.div`
   margin-bottom: ${({ theme }) => theme.sizing.gap};
 `;
 
-const Register = ({ portName }) => {
+const Register = ({ portName, withoutCode }) => {
   const { setCurrentAuthView, register, namespace, alert, setAlert } = useContext(UserContext);
   const { t } = useTranslation(namespace);
 
@@ -47,7 +47,7 @@ const Register = ({ portName }) => {
   const handleRegister = async e => {
     e.preventDefault();
     const { firstName, lastName, code, email, password, confirm } = info;
-    if (firstName && lastName && code && email && password && confirm) {
+    if (firstName && lastName && (code || withoutCode) && email && password && confirm) {
       if (password !== confirm) {
         setAlert({
           type: 'error',
@@ -56,11 +56,11 @@ const Register = ({ portName }) => {
         });
         return;
       }
-      if (password.length < 12) {
+      if (password.length < 1) {
         setAlert({
           type: 'error',
           message: t('Registration error'),
-          description: t('Password must be at least 12 characters in length!'),
+          description: t('Password cannot be empty!'),
         });
         return;
       }
@@ -78,7 +78,7 @@ const Register = ({ portName }) => {
   const disabled =
     info.firstName === '' ||
     info.lastName === '' ||
-    info.code === '' ||
+    (info.code === '' && !withoutCode) ||
     info.email === '' ||
     info.password === '' ||
     info.confirm === ''
@@ -109,13 +109,15 @@ const Register = ({ portName }) => {
           onChange={e => setInfo({ ...info, lastName: e.target.value })}
           required
         />
-        <Input
-          label={t('Code')}
-          name={t('Code')}
-          type="text"
-          onChange={e => setInfo({ ...info, code: e.target.value })}
-          required
-        />
+        {!withoutCode && (
+          <Input
+            label={t('Code')}
+            name={t('Code')}
+            type="text"
+            onChange={e => setInfo({ ...info, code: e.target.value })}
+            required
+          />
+        )}
         <Input
           label={t('Email / Username')}
           name={t('Email')}
@@ -127,7 +129,6 @@ const Register = ({ portName }) => {
           label={t('Password')}
           name={t('Password')}
           type="password"
-          info={t('Password must be at least 12 characters in length.')}
           onChange={e => setInfo({ ...info, password: e.target.value })}
           required
         />

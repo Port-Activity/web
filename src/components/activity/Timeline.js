@@ -8,7 +8,7 @@ import Timestamps from './Timestamps';
 
 const StyledTimeline = styled.div`
   display: grid;
-  grid-template-rows: 220px auto;
+  grid-template-rows: 240px auto;
   height: ${props => (props.isIE || props.isEdge ? 'auto' : 'calc(100vh - 64px)')};
   overflow-x: scroll;
   overflow-y: hidden;

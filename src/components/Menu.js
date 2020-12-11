@@ -136,6 +136,12 @@ const Menu = memo(props => {
             <MenuLink>{t('Activity')}</MenuLink>
           </MenuItem>
         )}
+        {modules.activity_module === 'enabled' && user.permissions.includes('manage_port_call') && (
+          <MenuItem onClick={() => history.push('/port-calls')}>
+            <Icon type="port-call" />
+            <MenuLink>{t('Port call timesheets')}</MenuLink>
+          </MenuItem>
+        )}
         {modules.logistics_module === 'enabled' && user.permissions.includes('basic_user_action') && (
           <MenuItem onClick={() => history.push('/logistics')}>
             <Icon type="logistics" />
@@ -204,7 +210,7 @@ const Menu = memo(props => {
           </MenuItem>
         )}
         {user.permissions.includes('manage_api_key') && (
-          <MenuItem onClick={() => history.push('/admin/api-key-weights')}>
+          <MenuItem onClick={() => history.push('/admin/api-key-weights/timestamps')}>
             <Icon type="key" />
             <MenuLink>{t('API key priorities')}</MenuLink>
           </MenuItem>
@@ -213,12 +219,6 @@ const Menu = memo(props => {
           <MenuItem onClick={() => history.push('/admin/modules')}>
             <Icon type="module" />
             <MenuLink>{t('Modules')}</MenuLink>
-          </MenuItem>
-        )}
-        {modules.activity_module === 'enabled' && user.permissions.includes('manage_port_call') && (
-          <MenuItem onClick={() => history.push('/port-calls')}>
-            <Icon type="port-call" />
-            <MenuLink>{t('Port call timesheets')}</MenuLink>
           </MenuItem>
         )}
         {user.permissions.includes('view_berth') && (
@@ -230,7 +230,7 @@ const Menu = memo(props => {
         {modules.queue_module === 'enabled' && user.permissions.includes('view_queue_slot_reservation') && (
           <MenuItem onClick={() => history.push('/queue-admin/admin-dashboard')}>
             <Icon type="info" />
-            <MenuLink>{t('Queue - Just-In-Time-Arrival')}</MenuLink>
+            <MenuLink>{t('Queue - Just-In-Time Arrival')}</MenuLink>
           </MenuItem>
         )}
         {modules.queue_module === 'enabled' && user.permissions.includes('view_own_queue_nomination') && (
@@ -257,10 +257,22 @@ const Menu = memo(props => {
             <MenuLink>{t('Berth reservations')}</MenuLink>
           </MenuItem>
         )}
+        {modules.queue_module === 'enabled' && user.permissions.includes('manage_setting') && (
+          <MenuItem onClick={() => history.push('/queue-admin/admin-queue-settings')}>
+            <Icon type="info" />
+            <MenuLink>{t('Queue settings')}</MenuLink>
+          </MenuItem>
+        )}
         {modules.map_module === 'enabled' && user.permissions.includes('basic_user_action') && (
           <MenuItem onClick={() => history.push('/map')}>
             <Icon type="map" />
             <MenuLink>{t('Map')}</MenuLink>
+          </MenuItem>
+        )}
+        {modules.map_module === 'enabled' && user.permissions.includes('manage_sea_chart_vessel') && (
+          <MenuItem onClick={() => history.push('/admin/map-port-actors')}>
+            <Icon type="info" />
+            <MenuLink>{t('Map Port Actors')}</MenuLink>
           </MenuItem>
         )}
         {user.permissions.includes('basic_user_action') && (

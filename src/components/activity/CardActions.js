@@ -2,6 +2,7 @@ import React, { useReducer, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import styled, { keyframes } from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
 import { UserContext } from '../../context/UserContext';
 import { NotificationContext } from '../../context/NotificationContext';
@@ -134,11 +135,12 @@ const ActionWrapper = styled.div`
 `;
 
 const CardActions = ({ portCallId, imo, vesselName, setOpen, isVis, visServiceId, ...props }) => {
-  const { apiCall, namespace, portName, user, rtaPointCoordinates } = useContext(UserContext);
+  const { apiCall, namespace, portName, user, rtaPointCoordinates, modules } = useContext(UserContext);
   const { timestampDefinitions } = useContext(TimestampContext);
   const { apiSendNotification } = useContext(NotificationContext);
   const { i18n } = useTranslation(namespace);
   const t = i18n.getFixedT(i18n.language, namespace);
+  const history = useHistory();
 
   const initCard = {
     showAddTimestamp: false,
@@ -358,6 +360,10 @@ const CardActions = ({ portCallId, imo, vesselName, setOpen, isVis, visServiceId
     dispatch(cancel());
   };
 
+  const showOnMap = () => {
+    history.push('/map/?search=' + encodeURIComponent(imo));
+  };
+
   return (
     <StyledCardActions {...props}>
       {user.permissions.includes('add_manual_timestamp') && (
@@ -507,6 +513,14 @@ const CardActions = ({ portCallId, imo, vesselName, setOpen, isVis, visServiceId
               </ActionButtons>
             </ActionForm>
           )}
+        </ActionWrapper>
+      )}
+      {modules.map_module === 'enabled' && (
+        <ActionWrapper>
+          <ActionButton outline onClick={() => dispatch(showOnMap())}>
+            <Icon type="map" />
+            {t('Show on map')}
+          </ActionButton>
         </ActionWrapper>
       )}
     </StyledCardActions>

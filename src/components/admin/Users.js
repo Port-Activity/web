@@ -316,6 +316,32 @@ const Users = () => {
     await fetchData(false, params);
   };
 
+  const handleLockUnlock = async e => {
+    setApiCallPending(true);
+    try {
+      await apiCall('post', 'user-lock', { id: e.id, locked: !e.locked });
+    } catch (e) {
+      setApiCallPending(false);
+      throw e;
+    }
+    setApiCallPending(false);
+    let params = defaultParams;
+    await fetchData(false, params);
+  };
+
+  const handleSuspendUnsuspend = async e => {
+    setApiCallPending(true);
+    try {
+      await apiCall('post', 'user-suspend', { id: e.id, suspended: !e.suspended });
+    } catch (e) {
+      setApiCallPending(false);
+      throw e;
+    }
+    setApiCallPending(false);
+    let params = defaultParams;
+    await fetchData(false, params);
+  };
+
   const handleCancel = e => {
     e.preventDefault();
     setPasswords(initPasswords);
@@ -423,19 +449,47 @@ const Users = () => {
       key: 'role_readable_name',
     },
     {
+      title: t('Registration'),
+      dataIndex: 'registration_type',
+      key: 'registration_type',
+    },
+    {
+      title: t('Created by'),
+      dataIndex: 'created_by_email',
+      key: 'created_by_email',
+    },
+    {
       title: t('Actions'),
       key: 'actions',
       render: record => {
         return (
           <RowActions>
             <Button
-              disabled={!sessionUser.permissions.includes('manage_user_' + record.role)}
               style={{ marginRight: '16px' }}
+              disabled={!sessionUser.permissions.includes('manage_user_' + record.role)}
               link
               onClick={() => showModal(record.id)}
             >
               <Icon type="edit" />
               {t('Edit')}
+            </Button>
+            <Button
+              style={{ marginRight: '16px' }}
+              link
+              disabled={!sessionUser.permissions.includes('manage_user_' + record.role)}
+              onClick={() => handleSuspendUnsuspend(record)}
+            >
+              <Icon type="calendar-clock" />
+              {record.suspended ? t('Unsuspend') : t('Suspend')}
+            </Button>
+            <Button
+              style={{ marginRight: '16px' }}
+              link
+              disabled={!sessionUser.permissions.includes('manage_user_' + record.role)}
+              onClick={() => handleLockUnlock(record)}
+            >
+              <Icon type="lock" />
+              {record.locked ? t('Unlock') : t('Lock')}
             </Button>
             <Popconfirm
               title={t('Delete user {{name}}?', { name: record.first_name })}

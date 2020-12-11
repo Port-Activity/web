@@ -171,13 +171,23 @@ export const UserProvider = ({ children }) => {
   );
 
   const register = async (firstname, lastname, code, email, password) => {
-    const result = await apiCall('post', 'register', {
-      first_name: firstname,
-      last_name: lastname,
-      code: code,
-      email: email,
-      password: password,
-    });
+    let result = null;
+    if (code !== '') {
+      result = await apiCall('post', 'register', {
+        first_name: firstname,
+        last_name: lastname,
+        code: code,
+        email: email,
+        password: password,
+      });
+    } else {
+      result = await apiCall('post', 'codeless-register', {
+        first_name: firstname,
+        last_name: lastname,
+        email: email,
+        password: password,
+      });
+    }
     if (result && result.status === 200) {
       const {
         data: {

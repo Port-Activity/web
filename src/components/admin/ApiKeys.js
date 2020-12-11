@@ -18,6 +18,7 @@ import Icon from '../ui/Icon';
 import Form from '../ui/Form';
 import Input from '../ui/Input';
 import Table from '../ui/Table';
+import SecretText from '../ui/SecretText';
 
 import PageSearch from '../page/PageSearch';
 import PageAction from '../page/PageAction';
@@ -120,6 +121,7 @@ const ApiKeys = () => {
       title: t('API key'),
       dataIndex: 'key',
       key: 'key',
+      render: text => <SecretText text={text} />,
     },
     {
       title: t('Bound user'),

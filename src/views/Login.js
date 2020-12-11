@@ -1,10 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { UserContext } from '../context/UserContext';
 
-import { Alert } from 'antd';
+import { message, Alert } from 'antd';
+
+import { API_URL } from '../utils/constants';
 
 import Heading from '../components/ui/Heading';
 import Input from '../components/ui/Input';
@@ -40,9 +42,23 @@ const Login = ({ portName }) => {
     password: '',
   };
 
+  const [isCodelessRegistration, setIsCodelessRegistration] = useState(false);
   const [credentials, setCredentials] = useState(initState);
   const { username, password } = credentials;
   const disabled = username === '' || password === '' ? true : false;
+
+  useEffect(() => {
+    fetch(`${API_URL}/public-settings?name=codeless_registration_module`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.codeless_registration_module === 'enabled') {
+          setIsCodelessRegistration(true);
+        }
+      })
+      .catch(e => {
+        message.error(e, 4);
+      });
+  }, []);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -76,9 +92,21 @@ const Login = ({ portName }) => {
           {t('Did you forget your password?')}
         </AmnesiaLink>
         <Button disabled={disabled}>{t('Login')}</Button>
-        <Button outline onClick={() => setCurrentAuthView('REGISTER')}>
-          {t('Register as a New User')}
-        </Button>
+        {!isCodelessRegistration && (
+          <Button outline onClick={() => setCurrentAuthView('REGISTER')}>
+            {t('Register as a New User')}
+          </Button>
+        )}
+        {isCodelessRegistration && (
+          <div>
+            <Button outline onClick={() => setCurrentAuthView('REGISTER_WITHOUT_CODE')}>
+              {t('Register without code')}
+            </Button>
+            <Button outline onClick={() => setCurrentAuthView('REGISTER')}>
+              {t('Register with code')}
+            </Button>
+          </div>
+        )}
       </LoginForm>
     </LoginWrapper>
   );

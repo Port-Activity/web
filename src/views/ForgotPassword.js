@@ -44,7 +44,7 @@ const ForgotPassword = ({ portName }) => {
       <LoginForm onSubmit={handleForgotPassword}>
         <LoginReturnLink onClick={() => setCurrentAuthView('LOGIN')}>{t('« Return to login')}</LoginReturnLink>
         <PortName h4>{t('Port of {{portname}}', { portname: portName })}</PortName>
-        <Heading h3>{t('Forgot Your Password?')}</Heading>
+        <Heading h3>{t('Forgot your password?')}</Heading>
         <Paragraph>{t('Please enter your e-mail address.')}</Paragraph>
         <Input label={t('Email')} name={t('Email')} type="email" onChange={e => setEmail(e.target.value)} autoFocus />
         <Button disabled={disabled}>{t('Request Password Reset')}</Button>

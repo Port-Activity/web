@@ -46,8 +46,8 @@ const ResetPassword = ({ location }) => {
   const [state, setState] = useState(initState);
   const { password, confirm, resetRequested } = state;
 
-  const dontMatch = state.password.length > 11 && state.password !== state.confirm ? true : false;
-  const tooShort = state.password.length < 12;
+  const dontMatch = state.password.length > 0 && state.password !== state.confirm ? true : false;
+  const tooShort = state.password.length < 1;
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -91,8 +91,7 @@ const ResetPassword = ({ location }) => {
         <PortName h4>{t('Port of {{portname}}', { portname: portName })}</PortName>
         <Heading h3>{t('Reset Password')}</Heading>
         {dontMatch && <Alert type="error" message={t('Passwords do not match')} />}
-        {tooShort && <Alert type="error" message={t('Password must be at least 12 characters in length!')} />}
-        {!tooShort && !dontMatch && <Alert type="" message={t('Password is ok!')} />}
+        {tooShort && <Alert type="error" message={t('Password cannot be empty!')} />}
         <Paragraph>{t('Please enter your new password')}</Paragraph>
         <Input
           label={t('Password')}

@@ -89,8 +89,15 @@ const LinkHeading = styled(Heading)`
   cursor: pointer;
 `;
 
+const BackLink = styled.a`
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: ${({ theme }) => theme.sizing.gap_small};
+`;
+
 const PortCallEdit = ({ record, refresh, pending }) => {
-  const { apiCall, namespace } = useContext(UserContext);
+  const { user, apiCall, namespace } = useContext(UserContext);
   const { t } = useTranslation(namespace);
   const actionsRef = useRef();
   const [actions, showActions] = useToggle(false, actionsRef);
@@ -167,7 +174,9 @@ const PortCallEdit = ({ record, refresh, pending }) => {
             endDate={endDate}
           />
         </WindowCalendar>
-        <Button link>{t('Save')}</Button>
+        <Button disabled={!user.permissions.includes('manage_port_call')} link>
+          {t('Save')}
+        </Button>
         <MarginButton link onClick={e => handleCancel(e)}>
           {t('Cancel')}
         </MarginButton>
@@ -286,6 +295,10 @@ const VesselTimestamps = props => {
     let params = defaultParams;
     await fetchData(false, params);
   };
+
+  function handleBackToVesselList() {
+    history.push('/vessels');
+  }
 
   const columns = [
     {
@@ -413,9 +426,16 @@ const VesselTimestamps = props => {
     <Layout>
       {alert && <Alert message={alert.message} type={alert.type} banner closable afterClose={() => setAlert(null)} />}
       <Page>
-        <LinkHeading onClick={() => history.push(`/port-calls?offset=0&search=${imo}`)}>
+        <LinkHeading
+          onClick={() =>
+            user.permissions.includes('manage_port_call') && history.push(`/port-calls?offset=0&search=${imo}`)
+          }
+        >
           {t(`Timestamps for IMO ${imo}`)}
         </LinkHeading>
+        <BackLink disabled={!user.permissions.includes('basic_user_action')} onClick={handleBackToVesselList}>
+          {t('« Back to vessel list')}
+        </BackLink>
         <Spin spinning={loading || apiCallPending}>
           <TimestampTable
             rowClassName={record => record.rowClass}

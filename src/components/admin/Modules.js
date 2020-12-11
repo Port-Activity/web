@@ -12,7 +12,10 @@ const Modules = () => {
   const { t } = useTranslation(namespace);
 
   const handleToggle = async (key, is_active) => {
-    await apiCall('put', `settings/${key}/${is_active ? 'disabled' : 'enabled'}`);
+    const result = await apiCall('put', `settings/${key}/${is_active ? 'disabled' : 'enabled'}`);
+    if (result && result.status === 200) {
+      window.location.reload();
+    }
   };
 
   const modulesData = Object.keys(modules).map((key, id) => {

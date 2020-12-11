@@ -34,7 +34,7 @@ const MarginButton = styled(Button)`
 `;
 
 const AdminPortCallTimesheet = props => {
-  const { apiCall, namespace, alert, setAlert } = useContext(UserContext);
+  const { user, apiCall, namespace, alert, setAlert } = useContext(UserContext);
   const { t } = useTranslation(namespace);
 
   const { id } = props.match.params;
@@ -127,10 +127,16 @@ const AdminPortCallTimesheet = props => {
             <Icon type="action" />
             {t('Download as CSV')}
           </MarginButton>
-          <MarginButton onClick={() => history.push(`/port-calls?offset=0&search=${portCall.ship.imo}`)}>
+          <MarginButton
+            disabled={!user.permissions.includes('manage_port_call')}
+            onClick={() => history.push(`/port-calls?offset=0&search=${portCall.ship.imo}`)}
+          >
             {t('All port calls')}
           </MarginButton>
-          <Button onClick={() => history.push(`/vessels/vessel-timestamps/${portCall.ship.imo}`)}>
+          <Button
+            disabled={!user.permissions.includes('manage_port_call')}
+            onClick={() => history.push(`/vessels/vessel-timestamps/${portCall.ship.imo}`)}
+          >
             {t('All timestamps')}
           </Button>
         </PageAction>

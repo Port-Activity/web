@@ -131,7 +131,13 @@ const AdminPortCallList = () => {
       render: (text, record) => (
         <>
           <ShipName>{record.vessel_name}</ShipName>
-          <ShipIMO onClick={() => history.push(`/vessels/vessel-timestamps/${record.imo}`)}>IMO {record.imo}</ShipIMO>
+          <ShipIMO
+            onClick={() =>
+              user.permissions.includes('manage_port_call') && history.push(`/vessels/vessel-timestamps/${record.imo}`)
+            }
+          >
+            IMO {record.imo}
+          </ShipIMO>
           <ShipRoute from={record.from_port} to={record.to_port} next={record.next_port} />
         </>
       ),

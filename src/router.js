@@ -50,6 +50,7 @@ import AdminDashboard from './views/queue_admin/AdminDashboard';
 import AdminQueueSettings from './views/queue_admin/AdminQueueSettings';
 import AdminApiKeyWeights from './views/admin/AdminApiKeyWeights';
 import MapView from './views/MapView';
+import AdminMapPortActors from './views/admin/AdminMapPortActors';
 
 const Router = () => {
   const { verifyingSession, modules, user } = useContext(UserContext);
@@ -164,9 +165,12 @@ const Router = () => {
                 <Route path="/queue-admin/admin-queue-settings" component={AdminQueueSettings} />
               )}
               {user.permissions.includes('manage_api_key') && (
-                <Route path="/admin/api-key-weights" exact component={AdminApiKeyWeights} />
+                <Route path="/admin/api-key-weights/:selected" exact component={AdminApiKeyWeights} />
               )}
               {modules && modules.map_module === 'enabled' && <Route path="/map" exact component={MapView} />}
+              {user.permissions.includes('manage_sea_chart_vessel') && modules.map_module === 'enabled' && (
+                <Route path="/admin/map-port-actors" exact component={AdminMapPortActors} />
+              )}
               <Route path="/profile" exact component={ProfilePage} />
               <Route path="/privacy-policy" exact component={PrivacyPolicyPage} />
               <Route path="/help-page" exact component={HelpPage} />

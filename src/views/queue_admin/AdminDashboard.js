@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = 'Queue - Just-In-Time-Arrival';
+    document.title = 'Queue - Just-In-Time Arrival';
   }, []);
 
   const params = new URLSearchParams(location.search);
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
     fetchData();
   }, [fetchData]);
 
-  useSocket('portcalls-changed', reFetch);
+  useSocket('queue-portcalls-changed', reFetch);
 
   const slotRequests = error || !data ? [] : data.data;
   const { start, total } = error || !data ? {} : data.pagination;
@@ -162,7 +162,7 @@ const AdminDashboard = () => {
   return (
     <Layout>
       {alert && <Alert message={alert.message} type={alert.type} banner closable afterClose={() => setAlert(null)} />}
-      <Page fullWidth title={t('Queue - Just-In-Time-Arrival')}>
+      <Page fullWidth title={t('Queue - Just-In-Time Arrival')}>
         <div style={{ clear: 'both' }}>
           <Table
             rowKey="id"
